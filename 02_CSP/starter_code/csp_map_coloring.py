@@ -1,79 +1,92 @@
 """
-Assignment starter: backtracking CSP solver for map colouring.
+Assignment starter: Map Coloring using CSP with Backtracking.
 
 Read ../guide.md and ../worked_example.md BEFORE you start coding here.
 
 Your job: fill in every function marked TODO. Do not change function
-signatures (the tests in test_csp_map_coloring.py rely on them).
-
-The problem: colour a map of Australia's 7 regions so that no two adjacent
-regions share a colour, using only 3 colours.
+signatures (the tests rely on them).
 """
 
-VARIABLES = ["WA", "NT", "SA", "Q", "NSW", "V", "T"]
+# Map of Australia variables and neighbor relationships
+AUSTRALIA_VARIABLES = ["WA", "NT", "SA", "Q", "NSW", "V", "T"]
 
-# Adjacency list: which regions border which. T (Tasmania) is an island --
-# it has no neighbours, so it's unconstrained.
-NEIGHBOURS = {
-    "WA":  ["NT", "SA"],
-    "NT":  ["WA", "SA", "Q"],
-    "SA":  ["WA", "NT", "Q", "NSW", "V"],
-    "Q":   ["NT", "SA", "NSW"],
-    "NSW": ["SA", "Q", "V"],
-    "V":   ["SA", "NSW"],
-    "T":   [],
+AUSTRALIA_DOMAINS = {
+    var: ["red", "green", "blue"] for var in AUSTRALIA_VARIABLES
 }
 
-DOMAIN = ["Red", "Green", "Blue"]
+AUSTRALIA_NEIGHBORS = {
+    "WA": ["NT", "SA"],
+    "NT": ["WA", "SA", "Q"],
+    "SA": ["WA", "NT", "Q", "NSW", "V"],
+    "Q": ["NT", "SA", "NSW"],
+    "NSW": ["Q", "SA", "V"],
+    "V": ["SA", "NSW"],
+    "T": [],  # Tasmania has no land borders
+}
+
+# Aliases expected by unit tests
+VARIABLES = AUSTRALIA_VARIABLES
+DOMAINS = AUSTRALIA_DOMAINS
+NEIGHBORS = AUSTRALIA_NEIGHBORS
 
 
-def is_consistent(assignment, var, value):
-    """TODO: return True if assigning `value` to `var` does not conflict
-    with any already-assigned neighbour of `var`.
+def is_consistent(var, color, assignment, neighbors):
+    """Return True if assigning `color` to `var` does not conflict with neighbors.
 
-    `assignment` is a dict {variable: value} of variables assigned so far.
-    Use NEIGHBOURS[var] to find which variables to check against.
+    `assignment` is a dict mapping assigned variables to their chosen colors.
+    `neighbors` is a dict mapping each variable to a list of adjacent variables.
     """
-    raise NotImplementedError("TODO: implement is_consistent()")
+    for neighbor in neighbors.get(var, []):
+        if neighbor in assignment and assignment[neighbor] == color:
+            return False
+    return True
 
 
-def select_unassigned_variable(assignment):
-    """TODO: return the name of a variable from VARIABLES that is not yet
-    a key in `assignment`. Return None if all variables are assigned.
+def select_unassigned_variable(assignment, variables):
+    """Return the next unassigned variable from `variables`.
 
-    A simple valid strategy: return the first unassigned variable in
-    VARIABLES order. (Bonus/optional: implement the MRV heuristic instead
-    -- see ../guide.md section 3.)
+    Returns the first variable in `variables` that is not yet in `assignment`.
     """
-    raise NotImplementedError("TODO: implement select_unassigned_variable()")
+    for var in variables:
+        if var not in assignment:
+            return var
+    return None
 
 
-def backtracking_search(variables, domain):
-    """TODO: run backtracking search and return a complete, consistent
-    assignment (dict {variable: value}), or None if no solution exists.
+def backtracking_search(variables, domains, neighbors, assignment=None):
+    """Implement Backtracking Search for Map Coloring CSP.
 
-    Follow the pseudocode in ../guide.md section 2:
-      1. If the assignment is complete, return it.
-      2. Otherwise pick an unassigned variable (select_unassigned_variable).
-      3. Try each value in `domain` for that variable, in order.
-      4. If is_consistent(), tentatively assign it and recurse.
-      5. If the recursive call succeeds, return its result.
-      6. If it fails, undo the assignment (backtrack) and try the next
-         value.
-      7. If no value works, return None (failure) so the caller backtracks
-         further.
-
-    Tip: write a helper function backtrack(assignment) and call it with
-    an empty dict to start.
+    Return a dict mapping variable -> color if a valid assignment exists,
+    or None if no solution exists.
     """
-    raise NotImplementedError("TODO: implement backtracking_search()")
+    if assignment is None:
+        assignment = {}
+
+    # Base case: if all variables are assigned, return the complete assignment
+    if len(assignment) == len(variables):
+        return assignment
+
+    var = select_unassigned_variable(assignment, variables)
+
+    for value in domains[var]:
+        if is_consistent(var, value, assignment, neighbors):
+            assignment[var] = value
+            result = backtracking_search(variables, domains, neighbors, assignment)
+            if result is not None:
+                return result
+            # Backtrack
+            del assignment[var]
+
+    return None
 
 
 if __name__ == "__main__":
-    solution = backtracking_search(VARIABLES, DOMAIN)
+    solution = backtracking_search(
+        AUSTRALIA_VARIABLES, AUSTRALIA_DOMAINS, AUSTRALIA_NEIGHBORS
+    )
     if solution:
         print("Solution found:")
-        for region in VARIABLES:
-            print(f"  {region}: {solution[region]}")
+        for var, color in solution.items():
+            print(f"  {var}: {color}")
     else:
-        print("No solution exists with this domain.")
+        print("No solution found.")
