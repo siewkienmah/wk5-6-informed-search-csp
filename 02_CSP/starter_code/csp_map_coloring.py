@@ -28,45 +28,62 @@ DOMAIN = ["Red", "Green", "Blue"]
 
 
 def is_consistent(assignment, var, value):
-    """TODO: return True if assigning `value` to `var` does not conflict
-    with any already-assigned neighbour of `var`.
+    """Return True if assigning `value` to `var` does not conflict with any
+    already-assigned neighbour of `var`.
 
     `assignment` is a dict {variable: value} of variables assigned so far.
-    Use NEIGHBOURS[var] to find which variables to check against.
+    Every neighbour in NEIGHBOURS[var] is checked, not just the most
+    recently assigned one. Neighbours that are still unassigned cannot
+    conflict yet, so .get() returning None is treated as "no conflict"
+    (None is never a legal colour).
     """
-    raise NotImplementedError("TODO: implement is_consistent()")
+    return all(assignment.get(neighbour) != value for neighbour in NEIGHBOURS[var])
 
 
 def select_unassigned_variable(assignment):
-    """TODO: return the name of a variable from VARIABLES that is not yet
-    a key in `assignment`. Return None if all variables are assigned.
+    """Return the first variable in VARIABLES order that is not yet a key in
+    `assignment`, or None if all variables are assigned.
 
-    A simple valid strategy: return the first unassigned variable in
-    VARIABLES order. (Bonus/optional: implement the MRV heuristic instead
-    -- see ../guide.md section 3.)
+    This is the simple "first unassigned" strategy. MRV would pick the
+    variable with the fewest remaining legal values instead; plain
+    backtracking is the baseline requirement here, so ordering is kept
+    deterministic and easy to hand-trace against ../worked_example.md.
     """
-    raise NotImplementedError("TODO: implement select_unassigned_variable()")
+    return next((var for var in VARIABLES if var not in assignment), None)
 
 
 def backtracking_search(variables, domain):
-    """TODO: run backtracking search and return a complete, consistent
-    assignment (dict {variable: value}), or None if no solution exists.
+    """Run backtracking search over `variables` using value set `domain`.
 
-    Follow the pseudocode in ../guide.md section 2:
-      1. If the assignment is complete, return it.
-      2. Otherwise pick an unassigned variable (select_unassigned_variable).
-      3. Try each value in `domain` for that variable, in order.
-      4. If is_consistent(), tentatively assign it and recurse.
-      5. If the recursive call succeeds, return its result.
-      6. If it fails, undo the assignment (backtrack) and try the next
-         value.
-      7. If no value works, return None (failure) so the caller backtracks
-         further.
+    Returns a complete, consistent assignment (dict {variable: value}), or
+    None if no solution exists. Follows the pseudocode in ../guide.md
+    section 2: pick an unassigned variable, try each domain value that is
+    consistent with the partial assignment, recurse, and undo the
+    assignment on failure so the caller can try its next value.
 
-    Tip: write a helper function backtrack(assignment) and call it with
-    an empty dict to start.
+    Note: `variables` supplies the completeness test, while the constraint
+    graph is read from the module-level NEIGHBOURS, and the variable order
+    from module-level VARIABLES (both fixed by the given function
+    signatures). Callers must therefore pass the same list that VARIABLES
+    holds -- the tests swap all of them together for each map.
     """
-    raise NotImplementedError("TODO: implement backtracking_search()")
+
+    def backtrack(assignment):
+        if len(assignment) == len(variables):
+            return dict(assignment)
+
+        var = select_unassigned_variable(assignment)
+        for value in domain:
+            if is_consistent(assignment, var, value):
+                assignment[var] = value
+                result = backtrack(assignment)
+                if result is not None:
+                    return result
+                del assignment[var]  # backtrack: undo before the next value
+
+        return None
+
+    return backtrack({})
 
 
 if __name__ == "__main__":
