@@ -55,23 +55,21 @@ def is_walkable(grid, r, c):
 
 
 def neighbours(grid, node):
-    """TODO: yield the valid 4-directional neighbours of `node` in `grid`.
-
-    `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
-    returns True for it. Use up/down/left/right moves only (no diagonals).
-    """
-    raise NotImplementedError("TODO: implement neighbours()")
+    r, c = node
+    # 上、下、左、右 四个方向
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    for dr, dc in directions:
+        nr, nc = r + dr, c + dc
+        # is_walkable 是模板自带函数，会自动判断是否越界以及是否是墙 '#'
+        if is_walkable(grid, nr, nc):
+            yield (nr, nc)
 
 
 def heuristic(node, goal):
-    """TODO: return the Manhattan distance between `node` and `goal`.
-
-    node and goal are (row, col) tuples.
-    Manhattan distance = |row1 - row2| + |col1 - col2|.
-    This must be admissible for 4-directional grid movement -- explain in
-    your submission notes why Manhattan distance satisfies this.
-    """
-    raise NotImplementedError("TODO: implement heuristic()")
+ 
+    r1, c1 = node
+    r2, c2 = goal
+    return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 
 def reconstruct_path(came_from, current):
@@ -88,27 +86,43 @@ def reconstruct_path(came_from, current):
 
 
 def astar(grid, start, goal):
-    """TODO: implement the A* algorithm.
+    # 1. 初始化数据结构
+    h_start = heuristic(start, goal)
+    # 优先队列中的元组：(f, -g, row, col, node) -> 用 -g 打破平局，优先拓展走得更远的节点
+    open_list = [(h_start, 0, start[0], start[1], start)]
+    g_score = {start: 0}
+    came_from = {}
+    closed_set = set()
 
-    Return a tuple: (path, cost)
-      - path: list of (row, col) tuples from start to goal, inclusive.
-              Return None if no path exists.
-      - cost: total path cost (int). Return float('inf') if no path exists.
+    # 2. 搜索主循环
+    while open_list:
+        f, neg_g, r, c, current = heapq.heappop(open_list)
 
-    Follow the pseudocode in ../guide.md section 4:
-      1. Use a heapq-based priority queue keyed on f(n) = g(n) + h(n).
-      2. Track g_score for every discovered node.
-      3. Track came_from so you can reconstruct the path.
-      4. Track a closed set of fully-expanded nodes.
-      5. Stop as soon as you POP the goal node from the open list
-         (not merely when you first see it as a neighbour).
+        if current in closed_set:
+            continue
 
-    Tie-break tip: pushing tuples like (f, -g, row, col, node) onto the
-    heap gives you a deterministic tie-break (prefer larger g) -- see the
-    worked example solution for this pattern if you get stuck.
-    """
-    raise NotImplementedError("TODO: implement astar()")
+        # POP 出 goal 时说明找到了最优路径
+        if current == goal:
+            return reconstruct_path(came_from, current), g_score[current]
 
+        closed_set.add(current)
+
+        # 遍历邻居
+        for nxt in neighbours(grid, current):
+            if nxt in closed_set:
+                continue
+
+            tentative_g = g_score[current] + 1
+
+            if nxt not in g_score or tentative_g < g_score[nxt]:
+                g_score[nxt] = tentative_g
+                came_from[nxt] = current
+                f_nxt = tentative_g + heuristic(nxt, goal)
+                # 将新节点压入优先队列
+                heapq.heappush(open_list, (f_nxt, -tentative_g, nxt[0], nxt[1], nxt))
+
+    # 3. 循环结束仍未到达 goal，说明无解
+    return None, float('inf')
 
 if __name__ == "__main__":
     start = find_cell(ASSIGNMENT_GRID, "S")
