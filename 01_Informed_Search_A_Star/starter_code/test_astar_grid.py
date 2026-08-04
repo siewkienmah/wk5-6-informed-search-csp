@@ -4,7 +4,7 @@ Tests for astar_grid.py
 Run with:
     pytest 01_Informed_Search_A_Star/starter_code/test_astar_grid.py -v
 
-`test_given_example` below is COMPLETE -- study it as a template.
+`test_given_example` below is COMkPLETE -- study it as a template.
 
 You must then write the 3 required test cases (test_case_1, test_case_2,
 test_case_3). Read ../../03_Test_Case_Design/mindmap.md and
