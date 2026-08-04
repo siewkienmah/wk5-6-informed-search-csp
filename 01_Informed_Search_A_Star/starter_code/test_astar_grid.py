@@ -44,28 +44,78 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Structure -> Obstacles requiring detour (Typical case).
+# Why I chose it: The heuristic (Manhattan distance) will naturally pull 
+# the search to the right, but a wall blocks it. This tests if the algorithm 
+# can correctly "give up" the greedy path, detour around the wall, and 
+# eventually find the goal.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = [
+        "S#..",
+        ".#..",
+        ".#..",
+        "...G"
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    # To get around the wall: 3 steps down, 3 steps right. Total cost = 6.
+    assert cost == 6
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: Edge Cases -> Unreachable Goal / No path.
+# Why I chose it: Tests the termination condition of the algorithm when it 
+# is impossible to reach the goal. It ensures that the priority queue 
+# empties gracefully and the function returns None and float('inf') instead 
+# of getting stuck in an infinite loop.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    grid = [
+        "S...",
+        "...#",
+        "..#G",
+        "...#"
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float('inf')
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Structure -> Heuristic Trap / U-shaped corridor (Stress case).
+# Why I chose it: S and G are physically adjacent, meaning the heuristic 
+# is initially very small (h=2). However, a long horizontal wall separates 
+# them, forcing the algorithm to explore almost the entire grid to go around. 
+# This rigorously tests the closed_set logic.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S.......",
+        "#######.",
+        "G.......",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
 
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    # S moves right 7 times, down 2 times, left 7 times to reach G. Total = 16.
+    assert cost == 16
 
 if __name__ == "__main__":
     import sys
