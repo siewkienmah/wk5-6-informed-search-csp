@@ -1,4 +1,4 @@
-# Submission Notes
+# Submission Note
 
 ## 1. Heuristic Admissibility
 The Manhattan distance heuristic used in `astar_grid.py` is admissible because it computes the grid-aligned distance assuming no obstacles exist. Since movement is restricted to 4 orthogonal directions and each step costs at least 1, the Manhattan distance never overestimates the actual shortest path cost to reach the goal ($h(n) \le h^*(n)$).
