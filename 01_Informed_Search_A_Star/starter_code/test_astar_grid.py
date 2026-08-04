@@ -45,26 +45,67 @@ def test_given_example():
 
 # ---------------------------------------------------------------------
 # TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Category: Unsolvable Case (No path exists / Target blocked by walls)
+# Why I chose it: To verify that the algorithm terminates gracefully 
+# and returns (None, float('inf')) when the goal is completely surrounded by walls.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = [
+        "S...",
+        "###.",
+        "G#..",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
 
 
 # ---------------------------------------------------------------------
 # TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Category: Edge / Boundary Case (Minimal distance / Start adjacent to Goal)
+# Why I chose it: To test the smallest valid step where start and goal 
+# are directly next to each other, ensuring cost = 1 without unnecessary expansions.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    grid = [
+        "SG",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 1
 
 
 # ---------------------------------------------------------------------
 # TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Category: Obstacle / Detour Case (Forced detour around wall)
+# Why I chose it: To test how A* handles a horizontal wall obstacle, 
+# verifying that it correctly finds the optimal alternative path around the wall.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S...",
+        "###.",
+        "...G",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 5
 
 
 if __name__ == "__main__":
