@@ -44,27 +44,61 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Boundary -> start equals goal / trivial input.
+# This checks the minimal path case where no movement is needed.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = ["S"]
+    start = (0, 0)
+    goal = (0, 0)
+
+    path, cost = astar(grid, start, goal)
+
+    assert path == [start]
+    assert cost == 0
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: Structure -> complex with obstacles, and Correctness -> optimality.
+# This checks that A* still finds the shortest path when walls force a detour.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    grid = [
+        "S#.",
+        "...",
+        "..G",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 4
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Solvability -> unsolvable / no valid path exists.
+# This checks that the solver reports failure correctly when the goal is cut off.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S#G",
+        "###",
+        "###",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
 
 
 if __name__ == "__main__":
