@@ -44,27 +44,68 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Structure -> complex (obstacles/walls). Solvability -> solvable.
+# Checks the solver correctly routes around walls instead of just going
+# in a straight line, and still finds the optimal-cost path.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = [
+        "S...",
+        ".#..",
+        ".#..",
+        "...G",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    # Matches the hand-traced worked example in 01_Informed_Search_A_Star/worked_example.md
+    assert cost == 6
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: Boundary Conditions -> start equals goal (minimal case).
+# Checks the algorithm doesn't loop or error when zero moves are needed.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    grid = [
+        "...",
+        ".G.",
+        "...",
+    ]
+    start = find_cell(grid, "G")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path == [goal]
+    assert cost == 0
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Solvability -> unsolvable (goal walled off).
+# Checks correct failure handling: no path found, no exception raised.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S.#",
+        "..#",
+        ".#G",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
 
 
 if __name__ == "__main__":

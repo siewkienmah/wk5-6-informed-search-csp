@@ -55,23 +55,28 @@ def is_walkable(grid, r, c):
 
 
 def neighbours(grid, node):
-    """TODO: yield the valid 4-directional neighbours of `node` in `grid`.
+    """Yield the valid 4-directional neighbours of `node` in `grid`.
 
     `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
     returns True for it. Use up/down/left/right moves only (no diagonals).
     """
-    raise NotImplementedError("TODO: implement neighbours()")
+    r, c = node
+    for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        nr, nc = r + dr, c + dc
+        if is_walkable(grid, nr, nc):
+            yield (nr, nc)
 
 
 def heuristic(node, goal):
-    """TODO: return the Manhattan distance between `node` and `goal`.
+    """Return the Manhattan distance between `node` and `goal`.
 
     node and goal are (row, col) tuples.
     Manhattan distance = |row1 - row2| + |col1 - col2|.
     This must be admissible for 4-directional grid movement -- explain in
     your submission notes why Manhattan distance satisfies this.
     """
-    raise NotImplementedError("TODO: implement heuristic()")
+    (r1, c1), (r2, c2) = node, goal
+    return abs(r1 - r2) + abs(c1 - c2)
 
 
 def reconstruct_path(came_from, current):
@@ -88,7 +93,7 @@ def reconstruct_path(came_from, current):
 
 
 def astar(grid, start, goal):
-    """TODO: implement the A* algorithm.
+    """Implement the A* algorithm.
 
     Return a tuple: (path, cost)
       - path: list of (row, col) tuples from start to goal, inclusive.
@@ -107,7 +112,36 @@ def astar(grid, start, goal):
     heap gives you a deterministic tie-break (prefer larger g) -- see the
     worked example solution for this pattern if you get stuck.
     """
-    raise NotImplementedError("TODO: implement astar()")
+    g_score = {start: 0}
+    came_from = {}
+    closed = set()
+
+    open_heap = [(heuristic(start, goal), 0, start[0], start[1], start)]
+
+    while open_heap:
+        f, neg_g, _, _, current = heapq.heappop(open_heap)
+
+        if current in closed:
+            continue
+        if current == goal:
+            return reconstruct_path(came_from, current), g_score[current]
+
+        closed.add(current)
+
+        for neighbour in neighbours(grid, current):
+            if neighbour in closed:
+                continue
+            tentative_g = g_score[current] + 1
+            if neighbour not in g_score or tentative_g < g_score[neighbour]:
+                g_score[neighbour] = tentative_g
+                came_from[neighbour] = current
+                f_score = tentative_g + heuristic(neighbour, goal)
+                heapq.heappush(
+                    open_heap,
+                    (f_score, -tentative_g, neighbour[0], neighbour[1], neighbour),
+                )
+
+    return None, float("inf")
 
 
 if __name__ == "__main__":
