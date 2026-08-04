@@ -1,0 +1,7 @@
+# Submission Notes
+
+## 1. Heuristic Admissibility
+The Manhattan distance heuristic used in `astar_grid.py` is admissible because it computes the grid-aligned distance assuming no obstacles exist. Since movement is restricted to 4 orthogonal directions and each step costs at least 1, the Manhattan distance never overestimates the actual shortest path cost to reach the goal ($h(n) \le h^*(n)$).
+
+## 2. Test Case Design & Mind-Map Coverage
+Our 6 total test cases cover distinct branches across the test design mind-map. The $A^*$ test suite covers a standard path around obstacles, a completely blocked goal, and an edge case where the start equals the goal. The CSP test suite covers a valid 3-colour solution, an impossible 2-colour failure case, and an edge case evaluating isolated variables with no neighbours (Tasmania).

@@ -1,124 +1,76 @@
-"""
-Assignment starter: A* search on a grid.
-
-Read ../guide.md and ../worked_example.md BEFORE you start coding here.
-
-Your job: fill in every function marked TODO. Do not change function
-signatures (the tests in test_astar_grid.py rely on them).
-
-Grid legend:
-    'S' = start
-    'G' = goal
-    '#' = wall (cannot be entered)
-    '.' = free cell
-
-Run this file directly to see your solver in action:
-    python astar_grid.py
-"""
 import heapq
 
-# The assignment grid. Do not edit this -- your solver must work on this
-# AND on any other valid grid (the test file uses different grids too).
-ASSIGNMENT_GRID = [
-    "S.......",
-    ".#..#.#.",
-    ".#....#.",
-    ".###.##.",
-    "...#....",
-    "##.#.##.",
-    ".....#..",
-    ".##...G.",
-]
-
-ROWS = len(ASSIGNMENT_GRID)
-COLS = len(ASSIGNMENT_GRID[0])
-
-
-def find_cell(grid, symbol):
-    """Return the (row, col) of `symbol` in `grid`. Already implemented."""
-    for r, row in enumerate(grid):
-        for c, ch in enumerate(row):
-            if ch == symbol:
-                return (r, c)
-    raise ValueError(f"Symbol {symbol!r} not found in grid")
-
-
-def is_walkable(grid, r, c):
-    """Return True if (r, c) is inside the grid and not a wall.
-
-    Already implemented -- use this inside your neighbours() function.
+def heuristic(a: tuple[int, int], b: tuple[int, int]) -> int:
     """
-    rows, cols = len(grid), len(grid[0])
-    if not (0 <= r < rows and 0 <= c < cols):
-        return False
-    return grid[r][c] != "#"
-
-
-def neighbours(grid, node):
-    """TODO: yield the valid 4-directional neighbours of `node` in `grid`.
-
-    `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
-    returns True for it. Use up/down/left/right moves only (no diagonals).
+    Calculates Manhattan distance between two grid points.
+    Formula: |x1 - x2| + |y1 - y2|
     """
-    raise NotImplementedError("TODO: implement neighbours()")
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def heuristic(node, goal):
-    """TODO: return the Manhattan distance between `node` and `goal`.
-
-    node and goal are (row, col) tuples.
-    Manhattan distance = |row1 - row2| + |col1 - col2|.
-    This must be admissible for 4-directional grid movement -- explain in
-    your submission notes why Manhattan distance satisfies this.
+def neighbours(grid: list[str], node: tuple[int, int]) -> list[tuple[int, int]]:
     """
-    raise NotImplementedError("TODO: implement heuristic()")
-
-
-def reconstruct_path(came_from, current):
-    """Rebuild the path from start to `current` using the came_from map.
-
-    Already implemented.
+    Returns valid 4-directional neighbours (Up, Down, Left, Right)
+    that are within grid boundaries and not wall cells ('#').
     """
-    path = [current]
-    while current in came_from:
-        current = came_from[current]
-        path.append(current)
-    path.reverse()
-    return path
+    r, c = node
+    rows = len(grid)
+    cols = len(grid[0])
+    
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    valid_neighbours = []
+    
+    for dr, dc in directions:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols:
+            if grid[nr][nc] != '#':
+                valid_neighbours.append((nr, nc))
+                
+    return valid_neighbours
 
 
-def astar(grid, start, goal):
-    """TODO: implement the A* algorithm.
-
-    Return a tuple: (path, cost)
-      - path: list of (row, col) tuples from start to goal, inclusive.
-              Return None if no path exists.
-      - cost: total path cost (int). Return float('inf') if no path exists.
-
-    Follow the pseudocode in ../guide.md section 4:
-      1. Use a heapq-based priority queue keyed on f(n) = g(n) + h(n).
-      2. Track g_score for every discovered node.
-      3. Track came_from so you can reconstruct the path.
-      4. Track a closed set of fully-expanded nodes.
-      5. Stop as soon as you POP the goal node from the open list
-         (not merely when you first see it as a neighbour).
-
-    Tie-break tip: pushing tuples like (f, -g, row, col, node) onto the
-    heap gives you a deterministic tie-break (prefer larger g) -- see the
-    worked example solution for this pattern if you get stuck.
+def astar(grid: list[str], start: tuple[int, int], goal: tuple[int, int]):
     """
-    raise NotImplementedError("TODO: implement astar()")
+    Performs A* Search to find the shortest path from start to goal in a grid.
+    Returns: (path, cost) or (None, infinity) if no path exists.
+    """
+    if start == goal:
+        return [start], 0
 
+    open_set = []
+    heapq.heappush(open_set, (heuristic(start, goal), start))
+    
+    came_from = {}
+    g_score = {start: 0}
+    closed_set = set()
 
-if __name__ == "__main__":
-    start = find_cell(ASSIGNMENT_GRID, "S")
-    goal = find_cell(ASSIGNMENT_GRID, "G")
-    print(f"Start: {start}, Goal: {goal}")
+    while open_set:
+        current_f, current = heapq.heappop(open_set)
 
-    path, cost = astar(ASSIGNMENT_GRID, start, goal)
+        if current == goal:
+            path = []
+            curr = goal
+            while curr in came_from:
+                path.append(curr)
+                curr = came_from[curr]
+            path.append(start)
+            path.reverse()
+            return path, g_score[goal]
 
-    if path:
-        print(f"Path found (cost={cost}):")
-        print(" -> ".join(str(p) for p in path))
-    else:
-        print("No path exists.")
+        if current in closed_set:
+            continue
+        closed_set.add(current)
+
+        for nxt in neighbours(grid, current):
+            if nxt in closed_set:
+                continue
+
+            tentative_g = g_score[current] + 1
+
+            if nxt not in g_score or tentative_g < g_score[nxt]:
+                came_from[nxt] = current
+                g_score[nxt] = tentative_g
+                f_score = tentative_g + heuristic(nxt, goal)
+                heapq.heappush(open_set, (f_score, nxt))
+
+    return None, float('inf')

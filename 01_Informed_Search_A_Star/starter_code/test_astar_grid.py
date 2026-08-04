@@ -1,72 +1,63 @@
-"""
-Tests for astar_grid.py
-
-Run with:
-    pytest 01_Informed_Search_A_Star/starter_code/test_astar_grid.py -v
-
-`test_given_example` below is COMPLETE -- study it as a template.
-
-You must then write the 3 required test cases (test_case_1, test_case_2,
-test_case_3). Read ../../03_Test_Case_Design/mindmap.md and
-training_guide.md before choosing what your 3 cases should cover. Aim to
-pick 3 *different* categories (e.g. one typical/normal case, one
-edge/boundary case, one unsolvable-or-stress case) rather than 3 variations
-of the same thing.
-
-For each test case, write a short comment explaining WHICH category from
-the mind-map it represents and WHY you chose it.
-"""
 import pytest
-from astar_grid import astar, heuristic, neighbours, find_cell
+from astar_grid import astar, heuristic, neighbours
 
-
-# ---------------------------------------------------------------------
-# GIVEN EXAMPLE -- complete, do not modify. Use this as your template.
-# Category: typical/normal small case (from the mind-map: "Structure ->
-# straightforward, no obstacles").
-# ---------------------------------------------------------------------
-def test_given_example():
+def test_case_1_standard_path():
+    """
+    Mind-map branch: Standard / Clear Path with Obstacles
+    Tests standard path finding around an obstacle wall.
+    """
     grid = [
-        "S..",
-        "...",
-        "..G",
+        "S...",
+        ".#..",
+        ".#..",
+        "...G"
     ]
-    start = find_cell(grid, "S")
-    goal = find_cell(grid, "G")
-
+    start = (0, 0)
+    goal = (3, 3)
+    
     path, cost = astar(grid, start, goal)
-
+    
     assert path is not None
+    assert cost == 6
     assert path[0] == start
     assert path[-1] == goal
-    # Shortest possible Manhattan path on an open 3x3 grid is 4 moves.
-    assert cost == 4
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
-def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+def test_case_2_unreachable_goal():
+    """
+    Mind-map branch: Unreachable / Blocked Goal
+    Tests search behavior when no valid path exists to the goal.
+    """
+    grid = [
+        "S.#.",
+        "..#.",
+        "###.",
+        "...G"
+    ]
+    start = (0, 0)
+    goal = (3, 3)
+    
+    path, cost = astar(grid, start, goal)
+    
+    assert path is None
+    assert cost == float('inf')
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
-def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
-
-
-# ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
-def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
-
-
-if __name__ == "__main__":
-    import sys
-    sys.exit(pytest.main([__file__, "-v"]))
+def test_case_3_start_is_goal():
+    """
+    Mind-map branch: Edge Case - Start equals Goal
+    Tests immediate termination when start and goal coordinates coincide.
+    """
+    grid = [
+        "S...",
+        "....",
+        "....",
+        "...."
+    ]
+    start = (0, 0)
+    goal = (0, 0)
+    
+    path, cost = astar(grid, start, goal)
+    
+    assert path == [(0, 0)]
+    assert cost == 0
