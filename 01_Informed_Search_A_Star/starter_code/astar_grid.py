@@ -60,7 +60,10 @@ def neighbours(grid, node):
     `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
     returns True for it. Use up/down/left/right moves only (no diagonals).
     """
-    raise NotImplementedError("TODO: implement neighbours()")
+    row, col = node
+    for r, c in ((row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)):
+        if is_walkable(grid, r, c):
+            yield (r, c)
 
 
 def heuristic(node, goal):
@@ -71,7 +74,7 @@ def heuristic(node, goal):
     This must be admissible for 4-directional grid movement -- explain in
     your submission notes why Manhattan distance satisfies this.
     """
-    raise NotImplementedError("TODO: implement heuristic()")
+    return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 
 def reconstruct_path(came_from, current):
@@ -107,7 +110,33 @@ def astar(grid, start, goal):
     heap gives you a deterministic tie-break (prefer larger g) -- see the
     worked example solution for this pattern if you get stuck.
     """
-    raise NotImplementedError("TODO: implement astar()")
+    open_heap = [(heuristic(start, goal), 0, start)]
+    g_score = {start: 0}
+    came_from = {}
+    closed = set()
+
+    while open_heap:
+        f, neg_g, node = heapq.heappop(open_heap)
+
+        if node == goal:
+            path = reconstruct_path(came_from, node)
+            return path, g_score[node]
+
+        if node in closed:
+            continue
+        closed.add(node)
+
+        for neighbour in neighbours(grid, node):
+            if neighbour in closed:
+                continue
+            tentative_g = g_score[node] + 1
+            if tentative_g < g_score.get(neighbour, float('inf')):
+                g_score[neighbour] = tentative_g
+                came_from[neighbour] = node
+                f_score = tentative_g + heuristic(neighbour, goal)
+                heapq.heappush(open_heap, (f_score, -tentative_g, neighbour))
+
+    return None, float('inf')
 
 
 if __name__ == "__main__":
