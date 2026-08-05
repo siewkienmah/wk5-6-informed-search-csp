@@ -3,18 +3,6 @@ Tests for csp_map_coloring.py
 
 Run with:
     pytest 02_CSP/starter_code/test_csp_map_coloring.py -v
-
-`test_given_example` below is COMPLETE -- study it as a template.
-
-You must then write the 3 required test cases (test_case_1, test_case_2,
-test_case_3). Read ../../03_Test_Case_Design/mindmap.md and
-training_guide.md before choosing what your 3 cases should cover. Aim to
-pick 3 *different* categories rather than 3 variations of the same thing
-(e.g. one typical/solvable case, one edge/boundary case, one
-unsolvable/over-constrained case).
-
-For each test case, write a short comment explaining WHICH category from
-the mind-map it represents and WHY you chose it.
 """
 import pytest
 from csp_map_coloring import backtracking_search, is_consistent
@@ -41,9 +29,6 @@ def _is_valid_solution(solution, variables, neighbours):
 # "Solvability -> solvable case").
 # ---------------------------------------------------------------------
 def test_given_example():
-    # backtracking_search() in this starter file is wired to the fixed
-    # Australia map problem (VARIABLES / NEIGHBOURS / DOMAIN, all module
-    # level in csp_map_coloring.py), so this test solves that real problem.
     from csp_map_coloring import VARIABLES, NEIGHBOURS, DOMAIN
 
     solution = backtracking_search(VARIABLES, DOMAIN)
@@ -53,27 +38,60 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# TEST CASE 1 - Solvable case with 3 colors
+# Category: Solvability -> solvable case
+# Why: Tests that Australia map can be colored with 3 colors
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    from csp_map_coloring import VARIABLES, NEIGHBOURS, DOMAIN
+
+    solution = backtracking_search(VARIABLES, DOMAIN)
+
+    # Should find a solution
+    assert solution is not None
+    assert _is_valid_solution(solution, VARIABLES, NEIGHBOURS)
+    
+    # All 7 regions should be assigned
+    assert len(solution) == len(VARIABLES)
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# TEST CASE 2 - Unsolvable case with 2 colors
+# Category: Unsolvable -> over-constrained
+# Why: Australia map needs 3 colors, so 2 colors should fail
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    from csp_map_coloring import VARIABLES, NEIGHBOURS
+
+    # Try with only 2 colors (Red and Green)
+    domain_2 = ["Red", "Green"]
+    solution = backtracking_search(VARIABLES, domain_2)
+
+    # Should fail (no solution with only 2 colors)
+    assert solution is None
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# TEST CASE 3 - Verify no two neighbors share same color
+# Category: Constraint checking -> consistency
+# Why: Tests that the solution satisfies all constraints
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    from csp_map_coloring import VARIABLES, NEIGHBOURS, DOMAIN
+
+    solution = backtracking_search(VARIABLES, DOMAIN)
+
+    # Solution must exist
+    assert solution is not None
+
+    # Check every constraint: no two adjacent regions share a color
+    for region, neighbors in NEIGHBOURS.items():
+        for neighbor in neighbors:
+            assert solution[region] != solution[neighbor]
+    
+    # Check that all regions are in the solution
+    for region in VARIABLES:
+        assert region in solution
 
 
 if __name__ == "__main__":
