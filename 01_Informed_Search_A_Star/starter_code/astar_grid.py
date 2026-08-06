@@ -56,11 +56,9 @@ def is_walkable(grid, r, c):
 
 def neighbours(grid, node):
     r, c = node
-    # 上、下、左、右 四个方向
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     for dr, dc in directions:
         nr, nc = r + dr, c + dc
-        # is_walkable 是模板自带函数，会自动判断是否越界以及是否是墙 '#'
         if is_walkable(grid, nr, nc):
             yield (nr, nc)
 
@@ -86,28 +84,25 @@ def reconstruct_path(came_from, current):
 
 
 def astar(grid, start, goal):
-    # 1. 初始化数据结构
     h_start = heuristic(start, goal)
-    # 优先队列中的元组：(f, -g, row, col, node) -> 用 -g 打破平局，优先拓展走得更远的节点
     open_list = [(h_start, 0, start[0], start[1], start)]
     g_score = {start: 0}
     came_from = {}
     closed_set = set()
 
-    # 2. 搜索主循环
+    
     while open_list:
         f, neg_g, r, c, current = heapq.heappop(open_list)
 
         if current in closed_set:
             continue
 
-        # POP 出 goal 时说明找到了最优路径
         if current == goal:
             return reconstruct_path(came_from, current), g_score[current]
 
         closed_set.add(current)
 
-        # 遍历邻居
+       
         for nxt in neighbours(grid, current):
             if nxt in closed_set:
                 continue
@@ -118,10 +113,8 @@ def astar(grid, start, goal):
                 g_score[nxt] = tentative_g
                 came_from[nxt] = current
                 f_nxt = tentative_g + heuristic(nxt, goal)
-                # 将新节点压入优先队列
                 heapq.heappush(open_list, (f_nxt, -tentative_g, nxt[0], nxt[1], nxt))
 
-    # 3. 循环结束仍未到达 goal，说明无解
     return None, float('inf')
 
 if __name__ == "__main__":
