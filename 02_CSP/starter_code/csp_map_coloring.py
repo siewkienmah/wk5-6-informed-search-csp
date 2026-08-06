@@ -12,8 +12,6 @@ regions share a colour, using only 3 colours.
 
 VARIABLES = ["WA", "NT", "SA", "Q", "NSW", "V", "T"]
 
-# Adjacency list: which regions border which. T (Tasmania) is an island --
-# it has no neighbours, so it's unconstrained.
 NEIGHBOURS = {
     "WA":  ["NT", "SA"],
     "NT":  ["WA", "SA", "Q"],
@@ -28,51 +26,54 @@ DOMAIN = ["Red", "Green", "Blue"]
 
 
 def is_consistent(assignment, var, value):
-    """TODO: return True if assigning `value` to `var` does not conflict
-    with any already-assigned neighbour of `var`.
+    """Return True if value does not conflict with assigned neighbours."""
+    for neighbour in NEIGHBOURS[var]:
+        if neighbour in assignment and assignment[neighbour] == value:
+            return False
 
-    `assignment` is a dict {variable: value} of variables assigned so far.
-    Use NEIGHBOURS[var] to find which variables to check against.
-    """
-    raise NotImplementedError("TODO: implement is_consistent()")
+    return True
 
 
 def select_unassigned_variable(assignment):
-    """TODO: return the name of a variable from VARIABLES that is not yet
-    a key in `assignment`. Return None if all variables are assigned.
+    """Return the first variable that has not been assigned."""
+    for variable in VARIABLES:
+        if variable not in assignment:
+            return variable
 
-    A simple valid strategy: return the first unassigned variable in
-    VARIABLES order. (Bonus/optional: implement the MRV heuristic instead
-    -- see ../guide.md section 3.)
-    """
-    raise NotImplementedError("TODO: implement select_unassigned_variable()")
+    return None
 
 
 def backtracking_search(variables, domain):
-    """TODO: run backtracking search and return a complete, consistent
-    assignment (dict {variable: value}), or None if no solution exists.
+    """Return a complete consistent assignment, or None."""
 
-    Follow the pseudocode in ../guide.md section 2:
-      1. If the assignment is complete, return it.
-      2. Otherwise pick an unassigned variable (select_unassigned_variable).
-      3. Try each value in `domain` for that variable, in order.
-      4. If is_consistent(), tentatively assign it and recurse.
-      5. If the recursive call succeeds, return its result.
-      6. If it fails, undo the assignment (backtrack) and try the next
-         value.
-      7. If no value works, return None (failure) so the caller backtracks
-         further.
+    def backtrack(assignment):
+        if len(assignment) == len(variables):
+            return assignment.copy()
 
-    Tip: write a helper function backtrack(assignment) and call it with
-    an empty dict to start.
-    """
-    raise NotImplementedError("TODO: implement backtracking_search()")
+        var = select_unassigned_variable(assignment)
+
+        for value in domain:
+            if is_consistent(assignment, var, value):
+                assignment[var] = value
+
+                result = backtrack(assignment)
+
+                if result is not None:
+                    return result
+
+                del assignment[var]
+
+        return None
+
+    return backtrack({})
 
 
 if __name__ == "__main__":
     solution = backtracking_search(VARIABLES, DOMAIN)
+
     if solution:
         print("Solution found:")
+
         for region in VARIABLES:
             print(f"  {region}: {solution[region]}")
     else:
