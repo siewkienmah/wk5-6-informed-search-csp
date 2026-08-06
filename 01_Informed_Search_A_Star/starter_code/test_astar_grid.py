@@ -44,27 +44,77 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Structure -> complex (obstacles that force a detour) /
+# Correctness -> optimality. Two wall rows each have a single gap, so the
+# path is forced through two "bottleneck" cells. This checks that A* finds
+# the true shortest route rather than a merely valid one.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = [
+        "S....",
+        "####.",
+        ".....",
+        ".####",
+        "....G",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    # Only route: (0,0)->(0,4) [4] ->(2,4) [2] ->(2,0) [4] ->(3,0) [1]
+    # ->(4,0) [1] ->(4,4) [4] = 16 moves.
+    assert cost == 16
+    assert len(path) - 1 == cost  # path length matches reported cost
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: Boundary Conditions -> start equals goal. astar() is called
+# directly (not via S/G grid symbols, since a cell can't hold both) with
+# start == goal to check the zero-length-path edge case is handled
+# without error.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    grid = [
+        "...",
+        "...",
+        "...",
+    ]
+    start = goal = (1, 1)
+
+    path, cost = astar(grid, start, goal)
+
+    assert path == [start]
+    assert cost == 0
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Solvability -> unsolvable / Correctness -> failure handling.
+# The goal cell is completely enclosed by walls on all four sides, so no
+# path can exist. Checks astar() reports failure correctly instead of
+# crashing or returning a bogus path.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S....",
+        ".###.",
+        ".#G#.",
+        ".###.",
+        ".....",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
 
 
 if __name__ == "__main__":
