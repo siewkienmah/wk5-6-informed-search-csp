@@ -5,6 +5,9 @@ Read ../guide.md and ../worked_example.md BEFORE you start coding here.
 
 Your job: fill in every function marked TODO. Do not change function
 signatures (the tests rely on them).
+
+run this file to verify that your implementation of the backtracking search algorithm is correct.
+python 02_CSP/starter_code/csp_map_coloring.py
 """
 
 # Map of Australia variables and neighbor relationships

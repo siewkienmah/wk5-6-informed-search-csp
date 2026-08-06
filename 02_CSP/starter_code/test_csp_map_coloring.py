@@ -1,5 +1,8 @@
 """
 Unit tests for csp_map_coloring.py.
+
+run this file with pytest to verify that your implementation of the backtracking search algorithm is correct.
+pytest 02_CSP/starter_code/test_csp_map_coloring.py
 """
 import pytest
 from csp_map_coloring import (

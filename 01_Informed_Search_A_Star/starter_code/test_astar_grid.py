@@ -1,5 +1,7 @@
 """
 Unit tests for astar_grid.py.
+run this file directly to see your solver in action:
+pytest 01_Informed_Search_A_Star/starter_code/test_astar_grid.py
 """
 import pytest
 from astar_grid import astar, find_cell

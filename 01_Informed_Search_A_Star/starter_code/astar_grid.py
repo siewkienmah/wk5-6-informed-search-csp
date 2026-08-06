@@ -13,7 +13,7 @@ Grid legend:
     '.' = free cell
 
 Run this file directly to see your solver in action:
-    python astar_grid.py
+    python 01_Informed_Search_A_Star/starter_code/astar_grid.py
 """
 import heapq
 
