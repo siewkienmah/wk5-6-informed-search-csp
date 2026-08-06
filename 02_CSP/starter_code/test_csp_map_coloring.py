@@ -53,29 +53,57 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Constraint checking -> conflicting adjacent regions.
+# Why I chose it: This directly tests that is_consistent() rejects assigning
+# the same colour to two neighbouring regions.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    assignment = {
+        "NT": "Red"
+    }
+
+    # WA and NT are neighbours, so WA cannot also be Red.
+    assert is_consistent(assignment, "WA", "Red") is False
+
+    # A different colour should be allowed.
+    assert is_consistent(assignment, "WA", "Green") is True
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: Edge/boundary case -> isolated unconstrained variable.
+# Why I chose it: Tasmania has no neighbours, so any colour should remain
+# consistent regardless of the colours assigned to other regions.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    assignment = {
+        "WA": "Red",
+        "NT": "Green",
+        "SA": "Blue",
+    }
+
+    assert is_consistent(assignment, "T", "Red") is True
+    assert is_consistent(assignment, "T", "Green") is True
+    assert is_consistent(assignment, "T", "Blue") is True
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Solvability -> unsolvable/over-constrained case.
+# Why I chose it: WA, NT, and SA form a triangle, so they require three
+# different colours. A domain containing only two colours cannot solve
+# the Australia map.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    from csp_map_coloring import VARIABLES
 
+    two_colour_domain = ["Red", "Green"]
 
+    solution = backtracking_search(VARIABLES, two_colour_domain)
+
+    assert solution is None
+    
 if __name__ == "__main__":
     import sys
     sys.exit(pytest.main([__file__, "-v"]))
