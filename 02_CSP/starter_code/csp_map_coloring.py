@@ -34,7 +34,10 @@ def is_consistent(assignment, var, value):
     `assignment` is a dict {variable: value} of variables assigned so far.
     Use NEIGHBOURS[var] to find which variables to check against.
     """
-    raise NotImplementedError("TODO: implement is_consistent()")
+    for neighbour in NEIGHBOURS[var]:
+        if neighbour in assignment and assignment[neighbour] == value:
+            return False
+    return True
 
 
 def select_unassigned_variable(assignment):
@@ -45,7 +48,10 @@ def select_unassigned_variable(assignment):
     VARIABLES order. (Bonus/optional: implement the MRV heuristic instead
     -- see ../guide.md section 3.)
     """
-    raise NotImplementedError("TODO: implement select_unassigned_variable()")
+    for var in VARIABLES:
+        if var not in assignment:
+            return var
+    return None
 
 
 def backtracking_search(variables, domain):
@@ -66,7 +72,23 @@ def backtracking_search(variables, domain):
     Tip: write a helper function backtrack(assignment) and call it with
     an empty dict to start.
     """
-    raise NotImplementedError("TODO: implement backtracking_search()")
+    def backtrack(assignment):
+        if len(assignment) == len(variables):
+            return dict(assignment)
+
+        var = select_unassigned_variable(assignment)
+
+        for value in domain:
+            if is_consistent(assignment, var, value):
+                assignment[var] = value
+                result = backtrack(assignment)
+                if result is not None:
+                    return result
+                del assignment[var]
+
+        return None
+
+    return backtrack({})
 
 
 if __name__ == "__main__":

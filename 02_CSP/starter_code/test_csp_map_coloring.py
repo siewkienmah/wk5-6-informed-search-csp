@@ -17,7 +17,7 @@ For each test case, write a short comment explaining WHICH category from
 the mind-map it represents and WHY you chose it.
 """
 import pytest
-from csp_map_coloring import backtracking_search, is_consistent
+import csp_map_coloring as csp
 
 
 def _is_valid_solution(solution, variables, neighbours):
@@ -41,39 +41,66 @@ def _is_valid_solution(solution, variables, neighbours):
 # "Solvability -> solvable case").
 # ---------------------------------------------------------------------
 def test_given_example():
-    # backtracking_search() in this starter file is wired to the fixed
-    # Australia map problem (VARIABLES / NEIGHBOURS / DOMAIN, all module
-    # level in csp_map_coloring.py), so this test solves that real problem.
-    from csp_map_coloring import VARIABLES, NEIGHBOURS, DOMAIN
-
-    solution = backtracking_search(VARIABLES, DOMAIN)
+    # backtracking_search() in this starter file solves the fixed Australia
+    # map problem using the module-level VARIABLES / NEIGHBOURS / DOMAIN.
+    solution = csp.backtracking_search(csp.VARIABLES, csp.DOMAIN)
 
     assert solution is not None
-    assert _is_valid_solution(solution, VARIABLES, NEIGHBOURS)
+    assert _is_valid_solution(solution, csp.VARIABLES, csp.NEIGHBOURS)
 
 
 # ---------------------------------------------------------------------
 # TODO Test Case 1
 # Which mind-map category does this represent? (edit this comment)
 # ---------------------------------------------------------------------
-def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+def test_case_1(monkeypatch):
+    # Category: Structure -> simple, solvable case. A small chain checks
+    # that adjacent regions receive different colours.
+    monkeypatch.setattr(csp, "VARIABLES", ["A", "B", "C"])
+    monkeypatch.setattr(csp, "NEIGHBOURS", {
+        "A": ["B"],
+        "B": ["A", "C"],
+        "C": ["B"],
+    })
+
+    solution = csp.backtracking_search(csp.VARIABLES, ["Red", "Green"])
+
+    assert solution is not None
+    assert _is_valid_solution(solution, csp.VARIABLES, csp.NEIGHBOURS)
 
 
 # ---------------------------------------------------------------------
 # TODO Test Case 2
 # Which mind-map category does this represent? (edit this comment)
 # ---------------------------------------------------------------------
-def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+def test_case_2(monkeypatch):
+    # Category: Boundary -> single variable. This checks the smallest CSP
+    # where one variable can be assigned without any constraints.
+    monkeypatch.setattr(csp, "VARIABLES", ["A"])
+    monkeypatch.setattr(csp, "NEIGHBOURS", {"A": []})
+
+    solution = csp.backtracking_search(csp.VARIABLES, ["Red", "Green"])
+
+    assert solution == {"A": "Red"}
 
 
 # ---------------------------------------------------------------------
 # TODO Test Case 3
 # Which mind-map category does this represent? (edit this comment)
 # ---------------------------------------------------------------------
-def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+def test_case_3(monkeypatch):
+    # Category: Solvability -> unsolvable. A triangle needs three colours,
+    # so two colours must cause the backtracking solver to return failure.
+    monkeypatch.setattr(csp, "VARIABLES", ["A", "B", "C"])
+    monkeypatch.setattr(csp, "NEIGHBOURS", {
+        "A": ["B", "C"],
+        "B": ["A", "C"],
+        "C": ["A", "B"],
+    })
+
+    solution = csp.backtracking_search(csp.VARIABLES, ["Red", "Green"])
+
+    assert solution is None
 
 
 if __name__ == "__main__":

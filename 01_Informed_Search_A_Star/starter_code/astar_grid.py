@@ -60,7 +60,11 @@ def neighbours(grid, node):
     `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
     returns True for it. Use up/down/left/right moves only (no diagonals).
     """
-    raise NotImplementedError("TODO: implement neighbours()")
+    r, c = node
+    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        nr, nc = r + dr, c + dc
+        if is_walkable(grid, nr, nc):
+            yield (nr, nc)
 
 
 def heuristic(node, goal):
@@ -71,7 +75,8 @@ def heuristic(node, goal):
     This must be admissible for 4-directional grid movement -- explain in
     your submission notes why Manhattan distance satisfies this.
     """
-    raise NotImplementedError("TODO: implement heuristic()")
+    (r, c), (gr, gc) = node, goal
+    return abs(r - gr) + abs(c - gc)
 
 
 def reconstruct_path(came_from, current):
@@ -107,7 +112,48 @@ def astar(grid, start, goal):
     heap gives you a deterministic tie-break (prefer larger g) -- see the
     worked example solution for this pattern if you get stuck.
     """
-    raise NotImplementedError("TODO: implement astar()")
+    open_heap = []
+    g_score = {start: 0}
+    came_from = {}
+    closed = set()
+
+    # Entries are (f, -g, row, col, node).  The -g tie-break prefers
+    # the node with the larger g value when f values are equal.
+    f_start = heuristic(start, goal)
+    heapq.heappush(open_heap, (f_start, 0, start[0], start[1], start))
+
+    while open_heap:
+        f, neg_g, _, _, current = heapq.heappop(open_heap)
+
+        # A node can have stale entries in the heap after its g-score
+        # has been improved, so skip nodes already fully expanded.
+        if current in closed:
+            continue
+
+        g = g_score[current]
+
+        # The assignment requires stopping when the goal is popped.
+        if current == goal:
+            return reconstruct_path(came_from, current), g
+
+        closed.add(current)
+
+        for nb in neighbours(grid, current):
+            if nb in closed:
+                continue
+
+            tentative_g = g + 1  # every grid move costs 1
+
+            if nb not in g_score or tentative_g < g_score[nb]:
+                came_from[nb] = current
+                g_score[nb] = tentative_g
+                f_nb = tentative_g + heuristic(nb, goal)
+                heapq.heappush(
+                    open_heap,
+                    (f_nb, -tentative_g, nb[0], nb[1], nb)
+                )
+
+    return None, float("inf")
 
 
 if __name__ == "__main__":
