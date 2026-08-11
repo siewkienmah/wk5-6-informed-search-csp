@@ -1,0 +1,7 @@
+# Submission Notes: A* Search and CSP Map Coloring
+
+## 1. Admissibility of Manhattan Distance Heuristic
+In a 4-directional grid without diagonal movement, the Manhattan distance $h(n) = |r_1 - r_2| + |c_1 - c_2|$ measures the exact minimum number of orthogonal steps required to reach the target on an unconstrained board. Because adding walls or obstacles can only increase or maintain the actual path length, $h(n)$ never overestimates the true remaining cost $h^*(n)$ to the goal. Therefore, Manhattan distance is an admissible heuristic, guaranteeing that $A^*$ search finds an optimal shortest path.
+
+## 2. Test Case Mind-Map Coverage
+The test suites cover diverse structural and solvability branches across both exercises to ensure full code coverage beyond simple success paths. For $A^*$, test cases validate typical open paths, forced detours around wall barriers, unsolvable blocked grids, and the degenerate start-equals-goal edge case. For CSP map coloring, tests verify complete 3-coloring solutions on Australia's map, over-constrained failure scenarios using a 2-color domain, direct neighbor consistency checking, and correct constraint satisfaction around high-degree hub regions like South Australia.

@@ -53,27 +53,55 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Mind-map category: Solvability -> Over-constrained / Unsolvable Case
+# Why: Tests solver behavior when insufficient domain values are provided.
+# The mainland Australia map contains mutually adjacent triangles (e.g., SA-WA-NT)
+# that require at least 3 colors. Restricting domain to 2 colors must return None.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    from csp_map_coloring import VARIABLES
+
+    two_color_domain = ["Red", "Green"]
+    solution = backtracking_search(VARIABLES, two_color_domain)
+
+    assert solution is None
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Mind-map category: Constraint Checking -> Direct Neighbor Conflict Detection
+# Why: Directly tests `is_consistent()` logic to verify that assigning a color
+# already held by an adjacent neighbor returns False, while assigning a distinct
+# color returns True.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    # WA and NT are adjacent neighbors in NEIGHBOURS
+    partial_assignment = {"WA": "Red"}
+
+    # Assigning 'Red' to NT should conflict with WA
+    assert is_consistent(partial_assignment, "NT", "Red") is False
+
+    # Assigning 'Blue' to NT should be consistent with WA
+    assert is_consistent(partial_assignment, "NT", "Blue") is True
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Mind-map category: Graph Structure -> Hub Variable / High Degree Constraints
+# Why: Tests constraint satisfaction around "SA" (South Australia), which is the
+# highest-degree node bordering 5 other regions. Ensures none of its 5 neighbors
+# share its assigned color in a complete solution.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    from csp_map_coloring import VARIABLES, NEIGHBOURS, DOMAIN
+
+    solution = backtracking_search(VARIABLES, DOMAIN)
+    assert solution is not None
+
+    sa_color = solution["SA"]
+    for neighbor in NEIGHBOURS["SA"]:
+        assert solution[neighbor] != sa_color
 
 
 if __name__ == "__main__":
