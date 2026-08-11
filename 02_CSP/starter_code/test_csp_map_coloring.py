@@ -57,24 +57,39 @@ def test_given_example():
 # Which mind-map category does this represent? (edit this comment)
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    # Category: Validity / solvable case.
+    # Checks that a normal Australia map solution satisfies all constraints.
+    from csp_map_coloring import VARIABLES, NEIGHBOURS, DOMAIN
 
+    solution = backtracking_search(VARIABLES, DOMAIN)
+
+    assert solution is not None
+    assert _is_valid_solution(solution, VARIABLES, NEIGHBOURS)
 
 # ---------------------------------------------------------------------
 # TODO Test Case 2
 # Which mind-map category does this represent? (edit this comment)
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    # Category: Boundary condition.
+    # Tasmania has no neighbours, so any colour should be consistent.
+    assignment = {}
 
+    assert is_consistent(assignment, "T", "Red") is True
+    assert is_consistent(assignment, "T", "Green") is True
+    assert is_consistent(assignment, "T", "Blue") is True
 
 # ---------------------------------------------------------------------
 # TODO Test Case 3
 # Which mind-map category does this represent? (edit this comment)
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    # Category: Failure handling / conflicting assignment.
+    # WA and NT are neighbours, so they cannot use the same colour.
+    assignment = {"WA": "Red"}
 
+    assert is_consistent(assignment, "NT", "Red") is False
+    assert is_consistent(assignment, "NT", "Green") is True
 
 if __name__ == "__main__":
     import sys

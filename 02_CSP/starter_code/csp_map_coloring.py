@@ -28,26 +28,25 @@ DOMAIN = ["Red", "Green", "Blue"]
 
 
 def is_consistent(assignment, var, value):
-    """TODO: return True if assigning `value` to `var` does not conflict
+    """Return True if assigning `value` to `var` does not conflict
     with any already-assigned neighbour of `var`.
-
-    `assignment` is a dict {variable: value} of variables assigned so far.
-    Use NEIGHBOURS[var] to find which variables to check against.
     """
-    raise NotImplementedError("TODO: implement is_consistent()")
+    for neighbour in NEIGHBOURS[var]:
+        if neighbour in assignment:
+            if assignment[neighbour] == value:
+                return False
 
-
+    return True
 def select_unassigned_variable(assignment):
-    """TODO: return the name of a variable from VARIABLES that is not yet
-    a key in `assignment`. Return None if all variables are assigned.
+    """Return the first variable from VARIABLES that has not been assigned.
 
-    A simple valid strategy: return the first unassigned variable in
-    VARIABLES order. (Bonus/optional: implement the MRV heuristic instead
-    -- see ../guide.md section 3.)
+    Return None if all variables have already been assigned.
     """
-    raise NotImplementedError("TODO: implement select_unassigned_variable()")
+    for var in VARIABLES:
+        if var not in assignment:
+            return var
 
-
+    return None
 def backtracking_search(variables, domain):
     """TODO: run backtracking search and return a complete, consistent
     assignment (dict {variable: value}), or None if no solution exists.
@@ -66,9 +65,26 @@ def backtracking_search(variables, domain):
     Tip: write a helper function backtrack(assignment) and call it with
     an empty dict to start.
     """
-    raise NotImplementedError("TODO: implement backtracking_search()")
+    def backtrack(assignment):
+        if len(assignment) == len(variables):
+            return assignment.copy()
 
+        var = select_unassigned_variable(assignment)
 
+        for value in domain:
+            if is_consistent(assignment, var, value):
+                assignment[var] = value
+
+                result = backtrack(assignment)
+
+                if result is not None:
+                    return result
+
+                del assignment[var]
+
+        return None
+
+    return backtrack({})
 if __name__ == "__main__":
     solution = backtracking_search(VARIABLES, DOMAIN)
     if solution:
