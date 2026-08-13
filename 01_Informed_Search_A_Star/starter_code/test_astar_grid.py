@@ -17,7 +17,7 @@ For each test case, write a short comment explaining WHICH category from
 the mind-map it represents and WHY you chose it.
 """
 import pytest
-from astar_grid import astar, heuristic, neighbours, find_cell
+from astar_grid import ASSIGNMENT_GRID, astar, heuristic, neighbours, find_cell
 
 
 # ---------------------------------------------------------------------
@@ -115,6 +115,57 @@ def test_case_3():
 
     assert path is None
     assert cost == float("inf")
+
+
+def test_assignment_grid():
+    """The supplied assignment problem has the independently verified cost."""
+    start = find_cell(ASSIGNMENT_GRID, "S")
+    goal = find_cell(ASSIGNMENT_GRID, "G")
+
+    # Direct coverage for the two required helper functions.
+    assert heuristic(start, goal) == 13
+    assert set(neighbours(ASSIGNMENT_GRID, start)) == {(0, 1), (1, 0)}
+
+    path, cost = astar(ASSIGNMENT_GRID, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 13
+    assert len(path) - 1 == cost
+
+
+def test_large_open_grid():
+    # Category: Input Size -> large/stress. This exercises a substantially
+    # larger search space than the six required cases.
+    size = 30
+    grid = ["." * size for _ in range(size)]
+    start = (0, 0)
+    goal = (size - 1, size - 1)
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert cost == 2 * (size - 1)
+    assert len(path) - 1 == cost
+
+
+def test_diagonal_movement_bonus():
+    grid = [
+        "S..",
+        "...",
+        "..G",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    assert heuristic(start, goal, allow_diagonal=True) == 2
+    assert (1, 1) in set(neighbours(grid, start, allow_diagonal=True))
+
+    path, cost = astar(grid, start, goal, allow_diagonal=True)
+
+    assert path == [(0, 0), (1, 1), (2, 2)]
+    assert cost == 2
 
 
 if __name__ == "__main__":

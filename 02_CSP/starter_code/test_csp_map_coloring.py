@@ -17,7 +17,13 @@ For each test case, write a short comment explaining WHICH category from
 the mind-map it represents and WHY you chose it.
 """
 import pytest
-from csp_map_coloring import backtracking_search, is_consistent
+import csp_map_coloring
+from csp_map_coloring import (
+    backtracking_search,
+    backtracking_search_with_count,
+    forward_checking_search,
+    is_consistent,
+)
 
 
 def _is_valid_solution(solution, variables, neighbours):
@@ -53,27 +59,87 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Boundary Conditions -> single variable, the smallest complete CSP.
 # ---------------------------------------------------------------------
-def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+def test_case_1(monkeypatch):
+    variables = ["A"]
+    neighbours = {"A": []}
+    monkeypatch.setattr(csp_map_coloring, "VARIABLES", variables)
+    monkeypatch.setattr(csp_map_coloring, "NEIGHBOURS", neighbours)
+
+    solution = backtracking_search(variables, ["Red"])
+
+    assert _is_valid_solution(solution, variables, neighbours)
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: Correctness -> validity, checking every already-assigned neighbour.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    assignment = {"WA": "Red", "NT": "Green"}
+
+    assert not is_consistent(assignment, "SA", "Red")
+    assert not is_consistent(assignment, "SA", "Green")
+    assert is_consistent(assignment, "SA", "Blue")
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Solvability -> unsolvable, a triangle cannot use only two colours.
 # ---------------------------------------------------------------------
-def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+def test_case_3(monkeypatch):
+    variables = ["A", "B", "C"]
+    neighbours = {
+        "A": ["B", "C"],
+        "B": ["A", "C"],
+        "C": ["A", "B"],
+    }
+    monkeypatch.setattr(csp_map_coloring, "VARIABLES", variables)
+    monkeypatch.setattr(csp_map_coloring, "NEIGHBOURS", neighbours)
+
+    solution = backtracking_search(variables, ["Red", "Green"])
+
+    assert solution is None
+
+
+def test_searches_honour_variables_argument():
+    """Custom variables are assigned even when absent from the map globals."""
+    variables = ["A", "B"]
+    domain = ["Red", "Green"]
+
+    plain_solution = backtracking_search(variables, domain)
+    forward_solution = forward_checking_search(variables, domain)
+
+    assert plain_solution == {"A": "Red", "B": "Red"}
+    assert forward_solution == {"A": "Red", "B": "Red"}
+
+
+def test_forward_checking_bonus(monkeypatch):
+    """Forward checking prunes the two-colour triangle earlier."""
+    variables = ["A", "B", "C"]
+    neighbours = {
+        "A": ["B", "C"],
+        "B": ["A", "C"],
+        "C": ["A", "B"],
+    }
+    domain = ["Red", "Green"]
+    monkeypatch.setattr(csp_map_coloring, "VARIABLES", variables)
+    monkeypatch.setattr(csp_map_coloring, "NEIGHBOURS", neighbours)
+
+    plain_solution, plain_nodes = backtracking_search_with_count(
+        variables, domain
+    )
+    forward_solution, forward_nodes = forward_checking_search(
+        variables, domain, return_node_count=True
+    )
+
+    assert plain_solution is None
+    assert forward_solution is None
+    assert plain_nodes == 5
+    assert forward_nodes == 3
+    assert forward_nodes < plain_nodes
 
 
 if __name__ == "__main__":

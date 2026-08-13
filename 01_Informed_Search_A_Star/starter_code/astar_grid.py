@@ -54,27 +54,36 @@ def is_walkable(grid, r, c):
     return grid[r][c] != "#"
 
 
-def neighbours(grid, node):
-    """TODO: yield the valid 4-directional neighbours of `node` in `grid`.
+def neighbours(grid, node, allow_diagonal=False):
+    """Yield the valid neighbours of `node` in `grid`.
 
     `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
-    returns True for it. Use up/down/left/right moves only (no diagonals).
+    returns True for it. Movement is up/down/left/right by default; set
+    `allow_diagonal` to True to include the four diagonal moves.
     """
     row, col = node
-    for r, c in ((row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)):
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    if allow_diagonal:
+        directions.extend([(-1, -1), (-1, 1), (1, -1), (1, 1)])
+
+    for row_change, col_change in directions:
+        r, c = row + row_change, col + col_change
         if is_walkable(grid, r, c):
             yield (r, c)
 
 
-def heuristic(node, goal):
-    """TODO: return the Manhattan distance between `node` and `goal`.
+def heuristic(node, goal, allow_diagonal=False):
+    """Return an admissible distance estimate from `node` to `goal`.
 
     node and goal are (row, col) tuples.
-    Manhattan distance = |row1 - row2| + |col1 - col2|.
-    This must be admissible for 4-directional grid movement -- explain in
-    your submission notes why Manhattan distance satisfies this.
+    Manhattan distance is used for four-directional movement. Chebyshev
+    distance is used when unit-cost diagonal movement is enabled.
     """
-    return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
+    row_distance = abs(node[0] - goal[0])
+    col_distance = abs(node[1] - goal[1])
+    if allow_diagonal:
+        return max(row_distance, col_distance)
+    return row_distance + col_distance
 
 
 def reconstruct_path(came_from, current):
@@ -90,8 +99,8 @@ def reconstruct_path(came_from, current):
     return path
 
 
-def astar(grid, start, goal):
-    """TODO: implement the A* algorithm.
+def astar(grid, start, goal, allow_diagonal=False):
+    """Run the A* algorithm from `start` to `goal` on `grid`.
 
     Return a tuple: (path, cost)
       - path: list of (row, col) tuples from start to goal, inclusive.
@@ -110,7 +119,7 @@ def astar(grid, start, goal):
     heap gives you a deterministic tie-break (prefer larger g) -- see the
     worked example solution for this pattern if you get stuck.
     """
-    open_heap = [(heuristic(start, goal), 0, start)]
+    open_heap = [(heuristic(start, goal, allow_diagonal), 0, start)]
     g_score = {start: 0}
     came_from = {}
     closed = set()
@@ -126,14 +135,16 @@ def astar(grid, start, goal):
             continue
         closed.add(node)
 
-        for neighbour in neighbours(grid, node):
+        for neighbour in neighbours(grid, node, allow_diagonal):
             if neighbour in closed:
                 continue
             tentative_g = g_score[node] + 1
             if tentative_g < g_score.get(neighbour, float('inf')):
                 g_score[neighbour] = tentative_g
                 came_from[neighbour] = node
-                f_score = tentative_g + heuristic(neighbour, goal)
+                f_score = tentative_g + heuristic(
+                    neighbour, goal, allow_diagonal
+                )
                 heapq.heappush(open_heap, (f_score, -tentative_g, neighbour))
 
     return None, float('inf')
