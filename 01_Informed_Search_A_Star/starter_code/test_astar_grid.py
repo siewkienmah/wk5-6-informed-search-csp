@@ -44,27 +44,88 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: typical/normal case with obstacles (Structure -> path exists
+# but must navigate around walls). Chosen because the given example has
+# no obstacles; this verifies the solver correctly avoids walls and still
+# finds a shortest path.
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = [
+        "S..#",
+        ".#..",
+        "..#G",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    # Optimal path length on this grid is 5
+    assert cost == 5
+    # Every step must be walkable and adjacent
+    for i in range(len(path) - 1):
+        r1, c1 = path[i]
+        r2, c2 = path[i + 1]
+        assert abs(r1 - r2) + abs(c1 - c2) == 1
+        assert grid[r2][c2] != "#"
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: edge/boundary case — start is adjacent to goal (or start == goal
+# style minimal distance). Chosen to exercise the base case where the open
+# list immediately pops the goal after zero or one expansion, and to check
+# that cost == 0 when start == goal.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    # Sub-case A: start == goal
+    grid_same = [
+        "S",
+    ]
+    # Manually treat the single cell as both start and goal
+    start = (0, 0)
+    goal = (0, 0)
+    path, cost = astar(grid_same, start, goal)
+    assert path == [start]
+    assert cost == 0
+
+    # Sub-case B: start immediately adjacent to goal (boundary of path length)
+    grid_adj = [
+        "SG",
+    ]
+    start = find_cell(grid_adj, "S")
+    goal = find_cell(grid_adj, "G")
+    path, cost = astar(grid_adj, start, goal)
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 1
+    assert len(path) == 2
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: unsolvable / no-path case (negative / failure case).
+# Chosen because a correct A* implementation must detect when the open
+# list empties without ever popping the goal and return (None, inf).
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S#G",
+        "###",
+        "...",
+    ]
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
 
 
 if __name__ == "__main__":

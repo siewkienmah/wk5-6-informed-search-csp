@@ -35,7 +35,6 @@ COLS = len(ASSIGNMENT_GRID[0])
 
 
 def find_cell(grid, symbol):
-    """Return the (row, col) of `symbol` in `grid`. Already implemented."""
     for r, row in enumerate(grid):
         for c, ch in enumerate(row):
             if ch == symbol:
@@ -44,9 +43,8 @@ def find_cell(grid, symbol):
 
 
 def is_walkable(grid, r, c):
-    """Return True if (r, c) is inside the grid and not a wall.
-
-    Already implemented -- use this inside your neighbours() function.
+    """
+    Return True if (r, c) is inside the grid and not a wall.
     """
     rows, cols = len(grid), len(grid[0])
     if not (0 <= r < rows and 0 <= c < cols):
@@ -55,29 +53,28 @@ def is_walkable(grid, r, c):
 
 
 def neighbours(grid, node):
-    """TODO: yield the valid 4-directional neighbours of `node` in `grid`.
-
-    `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
-    returns True for it. Use up/down/left/right moves only (no diagonals).
     """
-    raise NotImplementedError("TODO: implement neighbours()")
+    Yield the valid 4-directional neighbours of `node` in `grid`.
+    """
+    r, c = node
+    for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        nr, nc = r + dr, c + dc
+        if is_walkable(grid, nr, nc):
+            yield (nr, nc)
 
 
 def heuristic(node, goal):
-    """TODO: return the Manhattan distance between `node` and `goal`.
-
-    node and goal are (row, col) tuples.
-    Manhattan distance = |row1 - row2| + |col1 - col2|.
-    This must be admissible for 4-directional grid movement -- explain in
-    your submission notes why Manhattan distance satisfies this.
     """
-    raise NotImplementedError("TODO: implement heuristic()")
+    Return the Manhattan distance between `node` and `goal`.
+    """
+    r1, c1 = node
+    r2, c2 = goal
+    return abs(r1 - r2) + abs(c1 - c2)
 
 
 def reconstruct_path(came_from, current):
-    """Rebuild the path from start to `current` using the came_from map.
-
-    Already implemented.
+    """
+    Rebuild the path from start to `current` using the came_from map.
     """
     path = [current]
     while current in came_from:
@@ -88,7 +85,7 @@ def reconstruct_path(came_from, current):
 
 
 def astar(grid, start, goal):
-    """TODO: implement the A* algorithm.
+    """Implement the A* algorithm.
 
     Return a tuple: (path, cost)
       - path: list of (row, col) tuples from start to goal, inclusive.
@@ -107,7 +104,41 @@ def astar(grid, start, goal):
     heap gives you a deterministic tie-break (prefer larger g) -- see the
     worked example solution for this pattern if you get stuck.
     """
-    raise NotImplementedError("TODO: implement astar()")
+    # Priority queue entries: (f, -g, row, col, node)
+    # -g prefers larger g on ties (more progress toward goal)
+    open_heap = []
+    g_score = {start: 0}
+    came_from = {}
+    closed = set()
+
+    h0 = heuristic(start, goal)
+    heapq.heappush(open_heap, (h0, 0, start[0], start[1], start))
+
+    while open_heap:
+        f, neg_g, r, c, current = heapq.heappop(open_heap)
+
+        if current in closed:
+            continue
+        if current == goal:
+            path = reconstruct_path(came_from, current)
+            return path, g_score[current]
+
+        closed.add(current)
+
+        for neighbour in neighbours(grid, current):
+            if neighbour in closed:
+                continue
+            tentative_g = g_score[current] + 1  # uniform cost of 1 per step
+            if neighbour not in g_score or tentative_g < g_score[neighbour]:
+                came_from[neighbour] = current
+                g_score[neighbour] = tentative_g
+                f_score = tentative_g + heuristic(neighbour, goal)
+                heapq.heappush(
+                    open_heap,
+                    (f_score, -tentative_g, neighbour[0], neighbour[1], neighbour),
+                )
+
+    return None, float("inf")
 
 
 if __name__ == "__main__":
