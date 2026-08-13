@@ -53,27 +53,57 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Boundary Conditions -> a variable with no constraints at
+# all (Structure -> isolated node). Tasmania (T) has NEIGHBOURS["T"] ==
+# [], so it should be consistent with *every* colour regardless of how
+# the rest of the map is assigned. This checks is_consistent() doesn't
+# accidentally reject an unconstrained variable, a common off-by-one
+# trap when looping over an empty neighbour list.
 # ---------------------------------------------------------------------
-def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+def test_case_1_isolated_variable_has_no_constraints():
+    from csp_map_coloring import DOMAIN
+
+    assignment = {
+        "WA": "Red", "NT": "Green", "SA": "Blue",
+        "Q": "Red", "NSW": "Green", "V": "Red",
+    }
+    for colour in DOMAIN:
+        assert is_consistent(assignment, "T", colour) is True
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: What You're Actually Checking -> Validity (constraint-
+# violation detection), tested directly on is_consistent() rather than
+# through the full search. WA and NT are adjacent, so assigning NT the
+# same colour as an already-assigned WA must be rejected, while a
+# different colour must be accepted. This isolates the constraint-
+# checking logic from the search/backtracking logic.
 # ---------------------------------------------------------------------
-def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+def test_case_2_conflict_with_assigned_neighbour_detected():
+    assignment = {"WA": "Red"}
+
+    assert is_consistent(assignment, "NT", "Red") is False  # WA-NT adjacent
+    assert is_consistent(assignment, "NT", "Green") is True  # no conflict
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Solvability -> unsolvable / over-constrained (Structure ->
+# dense constraint graph). WA, NT and SA are mutually adjacent (a
+# triangle), so -- exactly like the 2-colour triangle in
+# worked_example.md -- the real Australia map cannot be coloured with
+# only 2 colours. This checks backtracking_search() explores every
+# branch and correctly reports failure (None) instead of crashing or
+# looping forever, on the full-size problem rather than the toy one.
 # ---------------------------------------------------------------------
-def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+def test_case_3_two_colours_unsolvable():
+    from csp_map_coloring import VARIABLES
+
+    solution = backtracking_search(VARIABLES, ["Red", "Green"])
+
+    assert solution is None
 
 
 if __name__ == "__main__":
