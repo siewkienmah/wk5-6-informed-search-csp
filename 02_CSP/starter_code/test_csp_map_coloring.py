@@ -17,7 +17,7 @@ For each test case, write a short comment explaining WHICH category from
 the mind-map it represents and WHY you chose it.
 """
 import pytest
-from csp_map_coloring import backtracking_search, is_consistent
+from csp_map_coloring import backtracking_search, is_consistent, NEIGHBOURS
 
 
 def _is_valid_solution(solution, variables, neighbours):
@@ -56,26 +56,57 @@ def test_given_example():
 # TODO Test Case 1
 # Which mind-map category does this represent? (edit this comment)
 # ---------------------------------------------------------------------
+# ------------------------------------------------------------
+# Test Case 1
+# Category: Typical / solvable case.
+# Tests a normal CSP with several connected regions and enough
+# colours to produce a complete valid assignment.
+# ------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    variables = ["WA", "NT", "SA", "Q"]
+    domain = ["Red", "Green", "Blue"]
+
+    solution = backtracking_search(variables, domain)
+
+    assert solution is not None
+    assert set(solution.keys()) == set(variables)
+
+    for var in variables:
+        assert solution[var] in domain
+
+    for var in variables:
+        for neighbour in NEIGHBOURS[var]:
+            if neighbour in solution:
+                assert solution[var] != solution[neighbour]
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# ------------------------------------------------------------
+# Test Case 2
+# Category: Boundary case.
+# Tests the smallest CSP input: one variable with no neighbours.
+# The solver should still assign a valid colour.
+# ------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    variables = ["T"]
+    domain = ["Red", "Green", "Blue"]
+
+    solution = backtracking_search(variables, domain)
+
+    assert solution is not None
+    assert set(solution.keys()) == set(variables)
+    assert solution["T"] in domain
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# ------------------------------------------------------------
+# Test Case 3
+# Category: Unsolvable / stress case.
+# WA, NT and SA form a triangle where every pair is adjacent.
+# With only two colours, no valid colouring can exist.
+# ------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    variables = ["WA", "NT", "SA"]
+    domain = ["Red", "Green"]
 
+    solution = backtracking_search(variables, domain)
 
-if __name__ == "__main__":
-    import sys
-    sys.exit(pytest.main([__file__, "-v"]))
+    assert solution is None

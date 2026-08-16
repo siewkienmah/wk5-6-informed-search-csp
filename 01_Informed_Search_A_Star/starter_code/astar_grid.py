@@ -55,23 +55,28 @@ def is_walkable(grid, r, c):
 
 
 def neighbours(grid, node):
-    """TODO: yield the valid 4-directional neighbours of `node` in `grid`.
+    """Yield valid 4-directional neighbours of node."""
 
-    `node` is a (row, col) tuple. A neighbour is valid if is_walkable()
-    returns True for it. Use up/down/left/right moves only (no diagonals).
-    """
-    raise NotImplementedError("TODO: implement neighbours()")
+    r, c = node
+
+    directions = [
+        (-1, 0),  # up
+        (1, 0),   # down
+        (0, -1),  # left
+        (0, 1)    # right
+    ]
+
+    for dr, dc in directions:
+        nr = r + dr
+        nc = c + dc
+
+        if is_walkable(grid, nr, nc):
+            yield (nr, nc)
 
 
 def heuristic(node, goal):
-    """TODO: return the Manhattan distance between `node` and `goal`.
-
-    node and goal are (row, col) tuples.
-    Manhattan distance = |row1 - row2| + |col1 - col2|.
-    This must be admissible for 4-directional grid movement -- explain in
-    your submission notes why Manhattan distance satisfies this.
-    """
-    raise NotImplementedError("TODO: implement heuristic()")
+    """Return the Manhattan distance between `node` and `goal`."""
+    return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
 
 def reconstruct_path(came_from, current):
@@ -88,37 +93,54 @@ def reconstruct_path(came_from, current):
 
 
 def astar(grid, start, goal):
-    """TODO: implement the A* algorithm.
+    """Implement the A* algorithm."""
 
-    Return a tuple: (path, cost)
-      - path: list of (row, col) tuples from start to goal, inclusive.
-              Return None if no path exists.
-      - cost: total path cost (int). Return float('inf') if no path exists.
+    open_list = []
 
-    Follow the pseudocode in ../guide.md section 4:
-      1. Use a heapq-based priority queue keyed on f(n) = g(n) + h(n).
-      2. Track g_score for every discovered node.
-      3. Track came_from so you can reconstruct the path.
-      4. Track a closed set of fully-expanded nodes.
-      5. Stop as soon as you POP the goal node from the open list
-         (not merely when you first see it as a neighbour).
+    # f = g + h
+    heapq.heappush(
+        open_list,
+        (heuristic(start, goal), 0, start)
+    )
 
-    Tie-break tip: pushing tuples like (f, -g, row, col, node) onto the
-    heap gives you a deterministic tie-break (prefer larger g) -- see the
-    worked example solution for this pattern if you get stuck.
-    """
-    raise NotImplementedError("TODO: implement astar()")
+    g_score = {start: 0}
+    came_from = {}
+    closed = set()
 
+    while open_list:
+        f, neg_g, current = heapq.heappop(open_list)
 
-if __name__ == "__main__":
-    start = find_cell(ASSIGNMENT_GRID, "S")
-    goal = find_cell(ASSIGNMENT_GRID, "G")
-    print(f"Start: {start}, Goal: {goal}")
+        # Convert negative g back to normal g
+        g = -neg_g
 
-    path, cost = astar(ASSIGNMENT_GRID, start, goal)
+        if current in closed:
+            continue
 
-    if path:
-        print(f"Path found (cost={cost}):")
-        print(" -> ".join(str(p) for p in path))
-    else:
-        print("No path exists.")
+        # Stop when the goal is removed from OPEN
+        if current == goal:
+            path = reconstruct_path(came_from, current)
+            return path, g
+
+        closed.add(current)
+
+        for neighbour in neighbours(grid, current):
+
+            if neighbour in closed:
+                continue
+
+            new_g = g + 1
+
+            if new_g < g_score.get(neighbour, float("inf")):
+
+                g_score[neighbour] = new_g
+                came_from[neighbour] = current
+
+                h = heuristic(neighbour, goal)
+                f = new_g + h
+
+                heapq.heappush(
+                    open_list,
+                    (f, -new_g, neighbour)
+                )
+
+    return None, float("inf")
