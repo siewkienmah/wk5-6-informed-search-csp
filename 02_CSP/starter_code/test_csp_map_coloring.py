@@ -53,27 +53,52 @@ def test_given_example():
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 1
+# Category: Solvability -> Unsolvable / Over-constrained case
+# Why: Tests that the algorithm returns None when given fewer colors than
+# required (2 colors for a graph containing 3-cliques like WA-NT-SA).
 # ---------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    from csp_map_coloring import VARIABLES
+    two_color_domain = ["Red", "Green"]
+
+    solution = backtracking_search(VARIABLES, two_color_domain)
+
+    assert solution is None
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 2
+# Category: Boundary / Edge Cases -> Trivial / Single isolated region
+# Why: Tests boundary execution with a single unconstrained region ("T")
+# and a minimal domain of size 1 to ensure simple edge cases pass cleanly.
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    from csp_map_coloring import NEIGHBOURS
+    single_var = ["T"]
+    single_domain = ["Blue"]
+
+    solution = backtracking_search(single_var, single_domain)
+
+    assert solution is not None
+    assert solution == {"T": "Blue"}
+    assert _is_valid_solution(solution, single_var, NEIGHBOURS)
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+# Category: Structure -> Subgraph / Partial map constraint
+# Why: Tests solver correctness on a smaller 3-region fully connected
+# sub-map (WA, NT, SA) to verify backtracking on tighter sub-problems.
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    from csp_map_coloring import NEIGHBOURS, DOMAIN
+    sub_vars = ["WA", "NT", "SA"]
+
+    solution = backtracking_search(sub_vars, DOMAIN)
+
+    assert solution is not None
+    assert _is_valid_solution(solution, sub_vars, NEIGHBOURS)
 
 
 if __name__ == "__main__":
