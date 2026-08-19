@@ -45,26 +45,65 @@ def test_given_example():
 
 # ---------------------------------------------------------------------
 # TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# Category: SIZE2 - Small typical input
+# --------------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = [
+        "S..",
+        "...",
+        "..G",
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert cost == 4
 
 
 # ---------------------------------------------------------------------
 # TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
+#  Category: STRUCT2 - Complex input with obstacles/walls
 # ---------------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    grid = [
+        "S....",
+        ".###.",
+        "...#.",
+        ".###.",
+        "....G",
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert cost == 8
 
 
 # ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
+# Test Case 3
+#  Category: SOLVE2 - Unsolvable input
 # ---------------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S#.",
+        ".#.",
+        ".#G",
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
+  
 
 
 if __name__ == "__main__":
