@@ -34,7 +34,11 @@ def is_consistent(assignment, var, value):
     `assignment` is a dict {variable: value} of variables assigned so far.
     Use NEIGHBOURS[var] to find which variables to check against.
     """
-    raise NotImplementedError("TODO: implement is_consistent()")
+    for neighbour in NEIGHBOURS[var]:
+        if neighbour in assignment and assignment[neighbour] == value:
+            return False
+
+    return True
 
 
 def select_unassigned_variable(assignment):
@@ -45,28 +49,43 @@ def select_unassigned_variable(assignment):
     VARIABLES order. (Bonus/optional: implement the MRV heuristic instead
     -- see ../guide.md section 3.)
     """
-    raise NotImplementedError("TODO: implement select_unassigned_variable()")
+    for variable in VARIABLES:
+        if variable not in assignment:
+            return variable
+
+    return None
 
 
 def backtracking_search(variables, domain):
-    """TODO: run backtracking search and return a complete, consistent
-    assignment (dict {variable: value}), or None if no solution exists.
+    def backtrack(assignment):
+        # If all variables are assigned, return the solution
+        if len(assignment) == len(variables):
+            return assignment.copy()
 
-    Follow the pseudocode in ../guide.md section 2:
-      1. If the assignment is complete, return it.
-      2. Otherwise pick an unassigned variable (select_unassigned_variable).
-      3. Try each value in `domain` for that variable, in order.
-      4. If is_consistent(), tentatively assign it and recurse.
-      5. If the recursive call succeeds, return its result.
-      6. If it fails, undo the assignment (backtrack) and try the next
-         value.
-      7. If no value works, return None (failure) so the caller backtracks
-         further.
+        # Pick an unassigned variable
+        var = select_unassigned_variable(assignment)
 
-    Tip: write a helper function backtrack(assignment) and call it with
-    an empty dict to start.
-    """
-    raise NotImplementedError("TODO: implement backtracking_search()")
+        # Try each value in the domain
+        for value in domain:
+            # Check whether this value is consistent
+            if is_consistent(assignment, var, value):
+                assignment[var] = value
+
+                # Recursively search for a solution
+                result = backtrack(assignment)
+
+                # If a solution was found, return it
+                if result is not None:
+                    return result
+
+                # Otherwise, undo the assignment
+                del assignment[var]
+
+        # No value worked
+        return None
+
+    # Start with an empty assignment
+    return backtrack({})
 
 
 if __name__ == "__main__":

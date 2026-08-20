@@ -43,28 +43,208 @@ def test_given_example():
     assert cost == 4
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------------
+# Test Case 1
+# Category: typical/normal case with a clear path and no obstacles.
+# This tests that A* can find the shortest path in a simple grid.
+# ---------------------------------------------------------------
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    grid = [
+        "S..G",
+        "...."
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 3
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------------
+# Test Case 2
+# Category: edge/boundary case.
+# The start and goal are separated by obstacles, so A* must
+# find the shortest route around them.
+# ---------------------------------------------------------------
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    grid = [
+        "S...",
+        ".##.",
+        "...G"
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 5
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# ---------------------------------------------------------------
+# Test Case 3
+# Category: unsolvable/stress case.
+# The walls completely block the goal, so A* should report
+# that no path exists.
+# ---------------------------------------------------------------
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    grid = [
+        "S#G",
+        "###",
+        "..."
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
+
+
+# ---------------------------------------------------------------
+# Test Case 1
+# Category: typical/normal case with a clear path and no obstacles.
+# This tests that A* can find the shortest path in a simple grid.
+# ---------------------------------------------------------------
+def test_case_1():
+    grid = [
+        "S..G",
+        "...."
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 3
+
+
+# ---------------------------------------------------------------
+# Test Case 2
+# Category: edge/boundary case.
+# The start and goal are separated by obstacles, so A* must
+# find the shortest route around them.
+# ---------------------------------------------------------------
+def test_case_2():
+    grid = [
+        "S...",
+        ".##.",
+        "...G"
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 5
+
+
+# ---------------------------------------------------------------
+# Test Case 3
+# Category: unsolvable/stress case.
+# The walls completely block the goal, so A* should report
+# that no path exists.
+# ---------------------------------------------------------------
+def test_case_3():
+    grid = [
+        "S#G",
+        "###",
+        "..."
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
+
+
+# ---------------------------------------------------------------
+# Test Case 1
+# Category: typical/normal case with a clear path and no obstacles.
+# This tests that A* can find the shortest path in a simple grid.
+# ---------------------------------------------------------------
+def test_case_1():
+    grid = [
+        "S..G",
+        "...."
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 3
+
+
+# ---------------------------------------------------------------
+# Test Case 2
+# Category: edge/boundary case.
+# The start and goal are separated by obstacles, so A* must
+# find the shortest route around them.
+# ---------------------------------------------------------------
+def test_case_2():
+    grid = [
+        "S...",
+        ".##.",
+        "...G"
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is not None
+    assert path[0] == start
+    assert path[-1] == goal
+    assert cost == 5
+
+
+# ---------------------------------------------------------------
+# Test Case 3
+# Category: unsolvable/stress case.
+# The walls completely block the goal, so A* should report
+# that no path exists.
+# ---------------------------------------------------------------
+def test_case_3():
+    grid = [
+        "S#G",
+        "###",
+        "..."
+    ]
+
+    start = find_cell(grid, "S")
+    goal = find_cell(grid, "G")
+
+    path, cost = astar(grid, start, goal)
+
+    assert path is None
+    assert cost == float("inf")
 
 
 if __name__ == "__main__":
