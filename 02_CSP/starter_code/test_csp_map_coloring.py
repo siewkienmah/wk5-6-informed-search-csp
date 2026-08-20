@@ -17,7 +17,7 @@ For each test case, write a short comment explaining WHICH category from
 the mind-map it represents and WHY you chose it.
 """
 import pytest
-from csp_map_coloring import backtracking_search, is_consistent
+from csp_map_coloring import VARIABLES, NEIGHBOURS, DOMAIN, backtracking_search, is_consistent
 
 
 def _is_valid_solution(solution, variables, neighbours):
@@ -52,28 +52,26 @@ def test_given_example():
     assert _is_valid_solution(solution, VARIABLES, NEIGHBOURS)
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 1
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# Category: solvability -> solvable case; checks that the map can be coloured with 3 colours.
 def test_case_1():
-    raise NotImplementedError("TODO: design and implement test case 1")
+    solution = backtracking_search(VARIABLES, ["Red", "Green", "Blue"])
 
+    assert solution is not None
+    assert _is_valid_solution(solution, VARIABLES, NEIGHBOURS)
 
-# ---------------------------------------------------------------------
-# TODO Test Case 2
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# Category: solvability -> unsolvable case; checks failure when only 2 colours are available.
 def test_case_2():
-    raise NotImplementedError("TODO: design and implement test case 2")
+    solution = backtracking_search(VARIABLES, ["Red", "Green"])
+
+    assert solution is None
 
 
-# ---------------------------------------------------------------------
-# TODO Test Case 3
-# Which mind-map category does this represent? (edit this comment)
-# ---------------------------------------------------------------------
+# Category: boundary/edge case -> minimum input; checks a single variable with one available colour.
 def test_case_3():
-    raise NotImplementedError("TODO: design and implement test case 3")
+    solution = backtracking_search(["WA"], ["Red"])
+
+    assert solution is not None
+    assert solution["WA"] == "Red"
 
 
 if __name__ == "__main__":
