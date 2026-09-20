@@ -110,7 +110,7 @@ git checkout -b wk5-6-<your-student-id>
 
 # 3. Set up Python environment
 python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
 # 4. Run the starter code / tests as you work
